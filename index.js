@@ -2,7 +2,9 @@ import _ from 'lodash'
 import _glob from 'glob'
 import bodyParser from 'body-parser'
 import chokidar from 'chokidar'
+import esbuild from 'esbuild'
 import express from 'express'
+import fs from 'fs-extra'
 import httpProxy from 'http-proxy'
 import tinylr from 'tiny-lr'
 import util from 'util'
@@ -12,6 +14,8 @@ export {Scss} from './utils.js'
 export {glob}
 export const watch = chokidar.watch
 export const template = _.template
+export {esbuild}
+export {fs}
 
 export const devServer = function(settings, tasks) {
     process.on('SIGINT', () => { process.exit(0) })

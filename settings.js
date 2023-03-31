@@ -10,6 +10,7 @@ export default async(argv) => {
             port: argv.port,
         },
         dir: {
+            dotbuild: path.resolve(path.join(path.dirname(new URL(import.meta.url).pathname))),
             workspace: path.resolve(process.cwd()),
         },
         minify: argv.minify,
