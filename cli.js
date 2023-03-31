@@ -6,6 +6,9 @@ import {hideBin} from 'yargs/helpers'
 import loadSettings from './settings.js'
 import getTask from './task.js'
 import yargs from 'yargs'
+import {visualizer} from "esbuild-visualizer/dist/plugin/index.js";
+import opn from 'open'
+let settings
 
 (async() => {   
 
@@ -22,18 +25,13 @@ import yargs from 'yargs'
             describe: 'The directory to build to',
             type: 'string',
         })
-        .option('metafile', {
-            default: false,
-            description: 'Add bundle meta information',
-            type: 'boolean',
-        })
         .option('minify', {
             default: false,
             description: 'Minify output',
             type: 'boolean',
         })
         .option('package', {
-            default: '',
+            default: '.',
             describe: 'The target package',
             type: 'string',
         })
@@ -44,12 +42,12 @@ import yargs from 'yargs'
             type: 'number',
         })
         .option('sourceMap', {
-            default: false,
+            default: true,
             description: 'Include source mapping',
             type: 'boolean',
         })
         .middleware(async(argv) => {
-            const settings = await loadSettings(argv)
+            settings = await loadSettings(argv)
             const tasks = await import(path.join(settings.dir.workspace, 'tasks.js'))
             const Task = getTask(settings)
             cli.tasks = tasks.loadTasks({settings, Task})
@@ -66,6 +64,17 @@ import yargs from 'yargs'
             }
             cli.settings = settings
             buildConfig(cli, argv)
+        })
+        .command('analyze', 'Analyze bundle contents', () => {}, async(argv) => {
+            await cli.tasks.build.start({incremental: false, minify: true, metafile: true, sourceMap: false})
+            const metadata = await fs.readFile(path.join(settings.dir.build, 'meta.json'), 'utf-8')
+            const fileContent = await visualizer(JSON.parse(metadata), {
+                title: 'stats.html',
+                template: 'treemap',
+            })
+            const htmlFile = path.join(settings.dir.build, 'stats.html')
+            await fs.writeFile(htmlFile, fileContent)
+            await opn(htmlFile)            
         })
         .command('assets', 'copy assets', () => {}, (argv) => {
             cli.tasks.assets.start(argv)

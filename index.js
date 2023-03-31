@@ -41,7 +41,7 @@ export const devServer = function(settings, tasks) {
     }, debounce.wait, debounce.options)
 
     const code = _.throttle(async() => {
-        await tasks.code.start({incremental: true, metafile, minify, sourceMap})
+        await tasks.code.start({incremental: true, metafile: false, minify: false, sourceMap: true})
         tinylr.changed(`app.${settings.buildId}.js`)
     }, debounce.wait, debounce.options)
 

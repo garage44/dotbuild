@@ -12,8 +12,8 @@ export default function getTask(settings) {
 
             this.execute = execute
             this.prefix = {
-                error: chalk.bold.red(`[${this.title}]`.padEnd(11, ' ')),
-                ok: chalk.bold.green(`[${this.title}]`.padEnd(11, ' ')),
+                error: chalk.bold.red(`[${this.title}]`.padEnd(20, ' ')),
+                ok: chalk.bold.green(`[${this.title}]`.padEnd(20, ' ')),
             }
         }
 
