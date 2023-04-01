@@ -6,6 +6,7 @@ import esbuild from 'esbuild'
 import express from 'express'
 import fs from 'fs-extra'
 import httpProxy from 'http-proxy'
+import path from 'path'
 import tinylr from 'tiny-lr'
 import util from 'util'
 const glob = util.promisify(_glob)
@@ -40,7 +41,7 @@ export const devServer = function(settings, tasks) {
     }, debounce.wait, debounce.options)
 
     const html = _.throttle(async() => {
-        await tasks.html.start({minify})
+        await tasks.html.start({minify: false})
         tinylr.changed('index.html')
     }, debounce.wait, debounce.options)
 
@@ -51,15 +52,15 @@ export const devServer = function(settings, tasks) {
 
     const stylesApp = _.throttle(async() => {
         await Promise.all([
-            tasks.stylesApp.start({minify, sourceMap}),
-            tasks.stylesComponents.start({minify, sourceMap}),
+            tasks.stylesApp.start({minify: false, sourceMap: true}),
+            tasks.stylesComponents.start({minify: false, sourceMap: true}),
         ])
         tinylr.changed(`app.${settings.buildId}.css`)
         tinylr.changed(`components.${settings.buildId}.css`)
     }, debounce.wait, debounce.options)
 
     const stylesComponents = _.throttle(async() => {
-        await tasks.scssComponents.start({minify, sourceMap})
+        await tasks.stylesComponents.start({minify: false, sourceMap: true})
         tinylr.changed(`components.${settings.buildId}.css`)
     }, debounce.wait, debounce.options)
 
